@@ -6,155 +6,129 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <librairie.h>
 
 #define DDR_IN 0x00
 #define DDR_OUT 0xff
-#define DEBOUNCE_TIME 20
-#define WAIT_TIME 2000
 
-//bool boutonMemoire;
-
-enum LedState
-{
-    RED = (1 << PA0),
-    GREEN = (1 << PA1),
-    OFF = 0x00
-};
+char mots[46] = "*P*O*L*Y*T*E*C*H*N*I*Q*U*E* *M*O*N*T*R*E*A*L*";
 
 enum Etat
 {
-    INIT = 0,
-    EA = 1,
-    EB = 2,
-    EC = 3
+    TRANSMETTRE = 0,
+    ROULER = 1
 };
 
 volatile Etat etatPresent;
 
-volatile bool peutChangerEtat;
+volatile int gMinuterieExpiree = 0;
+
+//ici car besoin de l'utiliser dans l'ISR du bouton
+Bouton b;
 
 void init()
 {
-    cli ();
     DDRD = DDR_IN;
+    DDRB = DDR_OUT;
     DDRA = DDR_OUT;
-    EIMSK |= (1 << INT0) ;
-    EICRA |= (1 << INT0);
-    sei ();
 
-    etatPresent = Etat::INIT;
+    etatPresent = Etat::TRANSMETTRE;
 
-    peutChangerEtat = true;
 }
 
-bool debounce()
-{
-
-    if (PIND & 0x04)
-    {
-        _delay_ms(DEBOUNCE_TIME);
-        if (PIND & 0x04)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void passeEtatFutur(Etat futur)
-{
-
-    if (debounce() && peutChangerEtat)
-    {
-        peutChangerEtat = false;
-        etatPresent = futur;
-    }
-
-    if (!(PIND & 0x04))
-    {
-        peutChangerEtat = true;
-    }
-}
-
+//Interuption du bouton, si il est actif donc front montant changer etatPresent
 ISR (INT0_vect) {
-
     switch (etatPresent)
-        {
-
-            case Etat::INIT :
-
-                passeEtatFutur(Etat::EA);
-
-                break;
-
-            case Etat::EA :
-
-                passeEtatFutur(Etat::EB);
-
-                break;
-
-            case Etat::EB :
-
-                passeEtatFutur(Etat::EC);
-
-                break;
-
-            case Etat::EC :
-
-                _delay_ms(WAIT_TIME);
-
-                etatPresent = Etat::INIT;
-
-                //mettre l'etat à true pour pouvoir appuyer de nouveau dans Init
-                peutChangerEtat = true;
-
-                break;
+    {
+    case Etat::TRANSMETTRE:
+        if(b.estActif()){
+            etatPresent = Etat::ROULER;
         }
+        break;
+    
+    case Etat::ROULER:
+        if(b.estActif()){
+            //le changement de etatPresent sera effectif apres la sequence des moteurs
+            etatPresent = Etat::TRANSMETTRE;
+        }
+        break;
+    }
+}
 
-    // Voir la note plus bas pour comprendre cette instruction et son rôle
+//Interuption du timer1
+ISR (TIMER1_COMPA_vect) {
 
-    EIFR |= (1 << INTF0) ;
+    gMinuterieExpiree = 1;
 
 }
 
 
 int main()
 {
-
     init();
 
-    while (true)
-    {
-        
+    //Timer1 qui va permettre d'appeler la fonction attendre()
+    Timer1 t1 = Timer1(&gMinuterieExpiree); //permet d'attendre en passant une variable en parametre, ce qui est impossible avec _delay_ms()
+    int dureeAttendre = 5; 
 
-        switch (etatPresent)
-        {
+    //Instance des moteurs du robot avec Timer0 + init() (PIN B3 B4)
+    Moteur motr;
+    motr.init();
 
-            case Etat::INIT :
+    //Instance de la classe Memoire
+    Memoire24CXXX m;
 
-                PORTA = LedState::OFF;
+    //init() du bouton (PIN D2)
+    b.init();
 
-                break;
+    //Instance de la classe pour transmission RS232
+    RS232 rs;
+    rs.initialisationUART();
 
-            case Etat::EA :
-
-                PORTA = LedState::OFF;
-
-                break;
-
-            case Etat::EB :
-
-                PORTA = LedState::OFF;
-
-                break;
-
-            case Etat::EC :
-
-                PORTA = LedState::GREEN;
-
-                break;
-        }
+    //Instance de Led (PIN A0 A1)
+    Led l = Led(EtatLed::OFF);
+    
+    for(int i = 0; i < 46; i++){
+        m.ecriture(i, mots[i]);
+        t1.attendre(dureeAttendre);
     }
 
+    while(true){
+        switch (etatPresent)
+        {
+        case Etat::ROULER:
+            l.changerCouleur(EtatLed::VERT);
+            motr.ajustementPWM(200,200);
+            motr.changerDirection(Direction::AVANT);
+            t1.attendre(30000);
+
+            motr.ajustementPWM(0,0);
+            l.changerCouleurAmbre(t1, 5, 2, 1000);
+
+            l.changerCouleur(EtatLed::ROUGE);
+            motr.ajustementPWM(100,100);
+            motr.changerDirection(Direction::ARRIERE);
+            t1.attendre(30000);
+            break;
+        
+        case Etat::TRANSMETTRE:
+
+            motr.ajustementPWM(0,0);
+            l.changerCouleur(EtatLed::OFF);
+
+            for (int i = 0; i < 46; i++)
+            {
+                uint8_t temp;
+                m.lecture(i, &temp);
+                rs.transmissionUART(temp);
+                t1.attendre(dureeAttendre);
+                
+            }
+            rs.transmissionUART('\n');
+            t1.attendre(dureeAttendre);
+            break;
+        }
+    }
+   
     return 0;
 }

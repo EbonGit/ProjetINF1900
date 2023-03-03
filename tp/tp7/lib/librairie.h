@@ -1,8 +1,10 @@
+
 # define F_CPU 8000000UL
 #include <avr/io.h>
 #include <util/twi.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include "memoire_24.h"
 
 #define DEBOUNCE_TIME 20
 
@@ -20,19 +22,26 @@
 #define UCSZ01 2
 #define UCSZ00 1
 
-#define CS11 1
-#define WGM10 0
-#define COM1A1 7
-#define COM1A0 6
-#define COM1B1 5
-#define COM1B0 4
+#define CS00 0
+#define WGM0 0
+#define COM0A1 7
+#define COM0A0 6
+#define COM0B1 5
+#define COM0B0 4
 
 enum Direction
 {
     AVANT = 0,
-    ARRIERE = (1 << PD2 | 1 << PD3),
-    DROITE = (0 << PD2 | 1 << PD3),
-    GAUCHE = (1 << PD2 | 0 << PD3)
+    ARRIERE = (1 << PB2 | 1 << PB5),
+    DROITE = (0 << PB2 | 1 << PB5),
+    GAUCHE = (1 << PB2 | 0 << PB5)
+};
+
+enum EtatLed
+{
+    ROUGE = (1 << PA0),
+    VERT = (1 << PA1),
+    OFF = 0x00
 };
 
 class Bouton
@@ -52,12 +61,12 @@ private:
 class Timer1
 {
 public:
-    Timer1(int* gMinuterieExpiree);
+    Timer1(volatile int* gMinuterieExpiree);
     void attendre(int duree);
     void partirMinuterie(int duree);
 
 private:
-    int* gMinuterieExpiree_;
+    volatile int* gMinuterieExpiree_;
 };
 
 class RS232
@@ -101,4 +110,16 @@ private:
     Direction direction_ = Direction::AVANT;
     int vitesse_a_ = 0;
     int vitesse_b_ = 0;
+};
+
+class Led
+{
+public:
+    Led() = default;
+    Led(EtatLed l);
+    void changerCouleur(EtatLed l);
+    void changerCouleurAmbre(Timer1 t, int t_vert, int t_rouge, int n);
+    EtatLed recupererCouleur();
+private:
+    EtatLed couleur_;
 };

@@ -32,10 +32,10 @@ PROJECTNAME=tp7
 PRJSRC= executable.cpp
 
 # Inclusions additionnels (ex: -I/path/to/mydir)
-INC=
+INC= -I ../lib
 
 # Libraires a lier (ex: -lmylib)
-LIBS= ../binaries/librairie.a
+LIBS= -l librairie -L ../
 
 # Niveau d'optimization
 # Utilisez s (size opt), 1, 2, 3 ou 0 (off)

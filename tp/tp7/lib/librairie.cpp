@@ -3,7 +3,7 @@
 */
 
 #include "librairie.h"
-#include "memoire_24.h"
+
 
 Bouton::Bouton(int masque){
     masque_ = masque;
@@ -45,7 +45,7 @@ bool Bouton::estActif(){
     return false;
 }
 
-Timer1::Timer1(int* gMinuterieExpiree){
+Timer1::Timer1(volatile int* gMinuterieExpiree){
     gMinuterieExpiree_ = gMinuterieExpiree;
 }
 
@@ -171,27 +171,62 @@ void Moteur::ajustementPWM(int a, int b)
 
     //TODO: changer pour Timer0 
 
-    OCR1A = a;
+    OCR0A = a;
 
-    OCR1B = b;
+    OCR0B = b;
 
 
     // division d'horloge par 8 - implique une fréquence de PWM fixe
 
-    TCCR1A = (1 << WGM10 | 1 << COM1A1 | 0 << COM1A0 | 1 << COM1B1 | 0 << COM1B0);
+    TCCR0A = (1 << WGM0 | 1 << COM0A1 | 0 << COM0A0 | 1 << COM0B1 | 0 << COM0B0);
 
-    TCCR1B = (1 << CS11);
+    TCCR0B = (1 << CS00);
 
-    TCCR1C = 0;
+    //TCCR1C = 0;
 }
 
 void Moteur::changerDirection(Direction d)
 {
     direction_ = d;
+    PORTB = d;
 }
 
 Direction Moteur::getDirection(void)
 {
     return direction_;
 }
+
+Led::Led(EtatLed l){
+    couleur_ = l;
+    PORTA = l;
+}
+
+void Led::changerCouleur(EtatLed l){
+    couleur_ = l;
+    PORTA = l;
+}
+
+/**
+ * Changer la couleur de la led pour un ratio entre vert et rouge.
+ *
+ * @param t Timer1 pour utiliser realiser le ration avec attendre().
+ * @param t_vert duree pendant lequel la led est verte.
+ * @param t_rouge duree pendant lequel la led est rouge.
+ * @param n nombre de fois que la boucle tourne (mettre a 1 pour pouvoir continuer a faire de la scrutation dans une boucle).
+ */
+void Led::changerCouleurAmbre(Timer1 t, int t_vert, int t_rouge, int n){
+    for (int i = 0; i < n; i++)
+    {
+        PORTA = EtatLed::VERT;
+        t.attendre(t_vert);
+
+        PORTA = EtatLed::ROUGE;
+        t.attendre(t_rouge);
+    }   
+}
+
+EtatLed Led::recupererCouleur(){
+    return couleur_;
+}
+
 
