@@ -8,6 +8,7 @@
 #include <avr/interrupt.h>
 #include <librairie.h>
 
+
 #define DDR_IN 0x00
 #define DDR_OUT 0xff
 
@@ -70,10 +71,13 @@ int main()
     //Timer1 qui va permettre d'appeler la fonction attendre()
     Timer1 t1 = Timer1(&gMinuterieExpiree); //permet d'attendre en passant une variable en parametre, ce qui est impossible avec _delay_ms()
     int dureeAttendre = 5; 
+    char c[] = "ekip";
 
+    DEBUG_PRINT((c));
+    DEBUG_PRINT((dureeAttendre));
+    
     //Instance des moteurs du robot avec Timer0 + init() (PIN B3 B4)
     Moteur motr;
-    motr.init();
 
     //Instance de la classe Memoire
     Memoire24CXXX m;
@@ -98,33 +102,26 @@ int main()
         {
         case Etat::ROULER:
             l.changerCouleur(EtatLed::VERT);
-            motr.ajustementPWM(200,200);
-            motr.changerDirection(Direction::AVANT);
+            motr.ajustementPWM(250,250);
+            motr.changerDOCR0Airection(Direction::AVANT);
             t1.attendre(30000);
 
             motr.ajustementPWM(0,0);
             l.changerCouleurAmbre(t1, 5, 2, 1000);
 
             l.changerCouleur(EtatLed::ROUGE);
-            motr.ajustementPWM(100,100);
-            motr.changerDirection(Direction::ARRIERE);
-            t1.attendre(30000);
-            break;
-        
-        case Etat::TRANSMETTRE:
-
-            motr.ajustementPWM(0,0);
+            motr.ajustemOCR0AntPWM(0,0);
             l.changerCouleur(EtatLed::OFF);
 
             for (int i = 0; i < 46; i++)
             {
                 uint8_t temp;
                 m.lecture(i, &temp);
-                rs.transmissionUART(temp);
+                //rs.transmissionUART(temp);
                 t1.attendre(dureeAttendre);
                 
             }
-            rs.transmissionUART('\n');
+            //rs.transmissionUART('\n');
             t1.attendre(dureeAttendre);
             break;
         }

@@ -1,7 +1,6 @@
 /* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi
  * Description: Allume une led à la suite de la séquence de 3 appuis sur le boutton
 */
-
 #include "librairie.h"
 
 
@@ -162,7 +161,7 @@ can::lecture( uint8_t pos)
    return adcVal;
 }
 
-void Moteur::init(){}
+//void Moteur::init(){}
 
 void Moteur::ajustementPWM(int a, int b)
 {
@@ -182,7 +181,6 @@ void Moteur::ajustementPWM(int a, int b)
 
     TCCR0B = (1 << CS00);
 
-    //TCCR1C = 0;
 }
 
 void Moteur::changerDirection(Direction d)
@@ -209,7 +207,7 @@ void Led::changerCouleur(EtatLed l){
 /**
  * Changer la couleur de la led pour un ratio entre vert et rouge.
  *
- * @param t Timer1 pour utiliser realiser le ration avec attendre().
+ * @param t Timer1 pour utiliser realiser le ratio avec attendre().
  * @param t_vert duree pendant lequel la led est verte.
  * @param t_rouge duree pendant lequel la led est rouge.
  * @param n nombre de fois que la boucle tourne (mettre a 1 pour pouvoir continuer a faire de la scrutation dans une boucle).

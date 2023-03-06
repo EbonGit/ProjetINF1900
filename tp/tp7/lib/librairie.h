@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "memoire_24.h"
+#include "debug.h"
 
 #define DEBOUNCE_TIME 20
 
@@ -100,7 +101,7 @@ class Moteur
 {
 public:
     Moteur() = default;
-    void init();
+    //void init();
     void ajustementPWM(int a, int b);
     void changerDirection(Direction d);
     Direction getDirection(void);

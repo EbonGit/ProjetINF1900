@@ -35,7 +35,7 @@ PRJSRC= executable.cpp
 INC= -I ../lib
 
 # Libraires a lier (ex: -lmylib)
-LIBS= -l librairie -L ../
+LIBS= -lrairie -L ../build
 
 # Niveau d'optimization
 # Utilisez s (size opt), 1, 2, 3 ou 0 (off)
@@ -124,7 +124,7 @@ OBJDEPS=$(CFILES:.c=.o) \
 # En plus de la commande make qui permet de compiler
 # votre projet, vous pouvez utilisez les commandes
 # make all, make install et make clean
-.PHONY: all install clean 
+.PHONY: all install clean debug
 
 # Make all permet simplement de compiler le projet
 #
@@ -166,6 +166,9 @@ install: $(HEXROMTRG)
 clean:
 	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d
 
+debug: CFLAGS += -DDEBUG -g
+debug: CXXFLAGS += -DDEBUG -g
+debug: install
 # Pour plus d'information sur les phony target, consulter:
 # http://bit.ly/1WBQe61
 
