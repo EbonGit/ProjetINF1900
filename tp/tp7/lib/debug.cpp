@@ -1,3 +1,8 @@
+/* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi, Amine Ghabia, Amine Zerouali
+ * Description: Définition de la fonction printRS232() pour l'option de debug selon un appel avec un int ou un char[] en paramètre
+ -> transmet par RS232 les valeurs d'une variable dans un format affichable par SerieViaUSB sur le pc.
+ */
+
 #include "debug.h"
 #include "librairie.h"
 #include <avr/io.h>

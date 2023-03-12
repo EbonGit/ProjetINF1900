@@ -1,6 +1,7 @@
-/* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi
- * Description: Allume une led à la suite de la séquence de 3 appuis sur le boutton
-*/
+/* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi, Amine Ghabia, Amine Zerouali
+ * Description: Définition de l'ensemble des classes de la librairie pour le robot du cours INF1900 (voir dossier pour plus de détail)
+ */
+
 #include "librairie.h"
 
 

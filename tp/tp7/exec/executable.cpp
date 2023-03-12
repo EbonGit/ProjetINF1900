@@ -1,5 +1,20 @@
-/* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi
- * Description: Allume une led à la suite de la séquence de 3 appuis sur le boutton
+/* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi, Amine Ghabia, Amine Zerouali
+ * Description: Ce programme permet de mettre en pratique la librairie créé lors des tp 7 et 8. Le robot possède 2 états machine, son état initial -> TRANSMETTRE 
+ pendant lequel il va cherhcer dans la mémoire externe EEPROM des données pour finalement les afficher via RS232. Lors de l'appui d'un bouton la machine bascule dans 
+ l'état ROULER durant laquelle le robot éxécute une séquence sur ses moteurs ainsi que sur une LED. L'appui de nouveau sur le bouton retourne la machine à l'état
+ TRANSMETTRE une fois la séquence en cours terminé.
++--------------+--------+-------------+--------------+
+| Etat Présent | Bouton |  Etat Futur |    Sortie    |
++--------------+--------+-------------+--------------+
+|  TRANSMETTRE |    1   |    ROULER   | transmission |
++--------------+--------+-------------+--------------+
+|      //      |    0   | TRANSMETTRE |      //      |
++--------------+--------+-------------+--------------+
+|    ROULER    |    1   | TRANSMETTRE |   séquence   |
+
++--------------+--------+-------------+--------------+
+|      //      |    0   |    ROULER   |      //      |
++--------------+--------+-------------+--------------+
 */
 
 #define F_CPU 8000000UL // 8 MHz
@@ -73,7 +88,7 @@ int main()
     int dureeAttendre = 5; 
     char c[] = "ekip";
 
-    DEBUG_PRINT((c));
+    DEBUG_PRINT((c)); //produit un warning quand on utilise pas la règle debug, car la variable n'est pas utilisé
     DEBUG_PRINT((dureeAttendre));
     
     //Instance des moteurs du robot avec Timer0 + init() (PIN B3 B4)
@@ -103,25 +118,28 @@ int main()
         case Etat::ROULER:
             l.changerCouleur(EtatLed::VERT);
             motr.ajustementPWM(250,250);
-            motr.changerDOCR0Airection(Direction::AVANT);
+            motr.changerDirection(Direction::AVANT);
             t1.attendre(30000);
 
             motr.ajustementPWM(0,0);
             l.changerCouleurAmbre(t1, 5, 2, 1000);
 
             l.changerCouleur(EtatLed::ROUGE);
-            motr.ajustemOCR0AntPWM(0,0);
+            motr.ajustementPWM(0,0);
             l.changerCouleur(EtatLed::OFF);
 
+            break;
+            
+        case Etat::TRANSMETTRE:
             for (int i = 0; i < 46; i++)
             {
                 uint8_t temp;
                 m.lecture(i, &temp);
-                //rs.transmissionUART(temp);
+                rs.transmissionUART(temp);
                 t1.attendre(dureeAttendre);
                 
             }
-            //rs.transmissionUART('\n');
+            rs.transmissionUART('\n');
             t1.attendre(dureeAttendre);
             break;
         }

@@ -1,3 +1,6 @@
+/* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi, Amine Ghabia, Amine Zerouali
+ * Description: Déclaration de l'ensemble des classes de la librairie pour le robot du cours INF1900 (voir dossier pour plus de détail)
+ */
 
 # define F_CPU 8000000UL
 #include <avr/io.h>
