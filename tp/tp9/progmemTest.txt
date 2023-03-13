@@ -1,0 +1,19 @@
+// commentaire 
+% commentaire
+# commentaire
+
+dbt;
+att 8;
+//dal 1;  // ceci est aussi un commentaire
+//det ;
+sgo 90;
+sar;     # un commentaire tout aussi bon
+
+mav 67;
+mre 9;
+trd;
+trg;
+mar;
+dbc 34;   % la derniere forme de commentaire
+fbc;
+fin;
