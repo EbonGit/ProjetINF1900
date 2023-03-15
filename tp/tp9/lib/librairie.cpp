@@ -46,10 +46,12 @@ bool Bouton::estActif(){
 }
 
 Timer1::Timer1(volatile int* gMinuterieExpiree){
+    
     gMinuterieExpiree_ = gMinuterieExpiree;
 }
 
 void Timer1::partirMinuterie(int duree){
+    
     *gMinuterieExpiree_ = 0;
 
     // mode CTC du timer 1 avec horloge divisée par 1024
