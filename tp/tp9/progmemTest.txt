@@ -1,34 +1,40 @@
+#ne doit pas executer
 DAL 1;
 MAV 128;
+
+#commence à executer
 DBT ;
 DAL 1;
 ATT 40;
 DET;
+
 MRE 128;
 ATT 120;
-MAR ;
+MAR;
 MAV 128;
 ATT 120;
-DAL 1;
-MAR ;
+DAL 2;
+MAR; #stop moteur
 ATT 80;
 MAV 128;
 ATT 80;
-TRD ;
+TRD; #tourner à droite
 ATT 120;
 DET;
-MAR ;
-DBC 4;
+MAR;
+
+DBC 4; #début boucle x4
 DAL 1;
 MAV 128;
 ATT 80;
-MAR ;
-TRG ;
+MAR;
+TRG; #tourner à gauche
 SGO 79;
 ATT 40;
 SGO 55;
 ATT 40;
-SAR;
-MAR ;
+SAR; #stop son
+MAR; #stop moteur
 FBC;
+
 FIN;
