@@ -65,11 +65,12 @@ private:
 class Timer1
 {
 public:
+    Timer1() = default;
     Timer1(volatile int* gMinuterieExpiree);
     void attendre(int duree);
     void partirMinuterie(int duree);
 
-private:
+protected:
     volatile int* gMinuterieExpiree_;
 };
 
