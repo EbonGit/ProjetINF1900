@@ -26,7 +26,7 @@ all: $(OUTPUTFILE)
 	$(CC) $(CFLAGS) $(CXXFLAGS) -c $<
 
 # utilisation de avr-ar pour compiler une librairie
-$(OUTPUTFILE): librairie.o memoire_24.o debug.o bouton.o can.o gestionSon.o led.o moteur.o RS232.o timer1.o
+$(OUTPUTFILE): librairie.o memoire_24.o debug.o bouton.o can.o gestionSon.o led.o moteur.o RS232.o timer1.o IR.o
 	avr-ar rcs $@ $^
 
 
@@ -53,3 +53,4 @@ led.o: led.h
 moteur.o: moteur.h
 RS232.o: RS232.h
 timer1.o: timer1.h
+IR.o: IR.h

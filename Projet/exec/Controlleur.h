@@ -10,4 +10,17 @@
 #define DDR_IN 0x00
 #define DDR_OUT 0xff
 
+class Controlleur
+{
+private:
+   Robot* robot_;
+public:
+    //Controlleur() = default;
+    Controlleur(Robot*);
+    void suivre();
+    void virerDroite();
+    void virerGauche();
+    
+};
+
 

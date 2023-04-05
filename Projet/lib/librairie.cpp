@@ -6,23 +6,22 @@
 
 //constructeur du robot
 Robot::Robot(volatile int* v){
-    //gMinuterieExpiree_ = v;
-    setVolatile(v);
-    changerCouleur(EtatLed::OFF);
+    timer.setVolatile(v);
+    led.changerCouleur(EtatLed::OFF);
     sequenceDebut();
 }
 
 //séquence arbitraire joué lors de l'allumage du robot
 void Robot::sequenceDebut(){
-    ajusterSon(64);
-    changerCouleur(EtatLed::ROUGE);
-    attendre(1000);
-    ajusterSon(56);
-    changerCouleur(EtatLed::VERT);
-    attendre(1000);
-    stopSon();
-    changerCouleur(EtatLed::OFF);
-    attendre(10000);
+    son.ajusterSon(64);
+    led.changerCouleur(EtatLed::ROUGE);
+    timer.attendre(1000);
+    son.ajusterSon(56);
+    led.changerCouleur(EtatLed::VERT);
+    timer.attendre(1000);
+    son.stopSon();
+    led.changerCouleur(EtatLed::OFF);
+    timer.attendre(10000);
 }
 
 

@@ -4,13 +4,13 @@
 
 #define F_CPU 8000000UL
 #include "memoire_24.h"
-#include "debug.h"
 #include "bouton.h"
-#include "can.h"
+#include "IR.h"
 #include "gestionSon.h"
 #include "led.h"
 #include "moteur.h"
 #include "RS232.h"
+
 //#include "timer1.h" defini dans led.h
 
 // constantes pour ISR et minuterie
@@ -35,11 +35,7 @@
 #define COM0B0 4
 #define CSN12 2
 
-class Robot : public Memoire24CXXX, 
-              public Led, 
-              public Timer1, 
-              public Moteur, 
-              public GestionSon
+class Robot
 {
 private:
     /* data */
@@ -48,5 +44,12 @@ public:
     Robot(volatile int*);
     //methodes
     void sequenceDebut();
+    //mettre en privé + encapsuler
+    Memoire24CXXX memoire;
+    Led led = Led(EtatLed::OFF);
+    Timer1 timer;
+    Moteur moteur;
+    GestionSon son;
+    IR ir = IR();
 };
 

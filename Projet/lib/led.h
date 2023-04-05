@@ -8,9 +8,9 @@
 
 enum EtatLed
 {
-    ROUGE = (1 << PA0),
-    VERT = (1 << PA1),
-    OFF = 0x00
+    ROUGE = (1 << PA2),
+    VERT = (1 << PA3),
+    OFF = (0 << PA2) | (0 << PA3)
 };
 
 class Led
