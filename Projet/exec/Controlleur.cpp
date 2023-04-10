@@ -21,7 +21,7 @@ void Controlleur::virerDroite(){
 void Controlleur::virerGauche(){
     robot_->moteur.changerDirection(Direction::GAUCHE);
     robot_->moteur.ajustementPWM(255,255);
-    _delay_ms(10);
+    _delay_ms(20);
     robot_->moteur.changerDirection(Direction::AVANT);
     _delay_ms(50);
     robot_->moteur.changerDirection(Direction::GAUCHE);
@@ -29,8 +29,9 @@ void Controlleur::virerGauche(){
     _delay_ms(25);
 }
 
-void Controlleur::suivre(){
-    int tour_restant = 3;
+void Controlleur::suivre(int tour_restant_, int distance_active, int distance_stop){
+
+    int tour_restant = tour_restant_;
     bool trigger = false;
     bool estDroite = true;
 
@@ -45,7 +46,7 @@ void Controlleur::suivre(){
             virerGauche();
         }
 
-        if(distance < 35){
+        if(distance < distance_active){
             trigger = true;
         }
 
@@ -56,7 +57,7 @@ void Controlleur::suivre(){
 
         if(tour_restant < 0){
             trigger = false;
-            tour_restant = 3;
+            tour_restant = tour_restant_;
             if(robot_->moteur.getDirection() == Direction::DROITE){
                 estDroite = false;
             }
@@ -65,10 +66,58 @@ void Controlleur::suivre(){
             }
         }
 
-        if(distance < 4){
+        if(distance < distance_stop){
             while(true);
         }
 
     }
+
+}
+
+void Controlleur::tournerDroite(){
+    robot_->moteur.changerDirection(Direction::DROITE);
+    robot_->moteur.ajustementPWM(255,255);
+    _delay_ms(PERIODE_TOURNER);
+    robot_->moteur.changerDirection(Direction::AVANT);
+    robot_->moteur.ajustementPWM(0,0);
+    _delay_ms(PERIODE_TOURNER);
+}
+
+void Controlleur::tournerGauche(){
+    robot_->moteur.changerDirection(Direction::GAUCHE);
+    robot_->moteur.ajustementPWM(255,255);
+    _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
+    robot_->moteur.changerDirection(Direction::AVANT);
+    robot_->moteur.ajustementPWM(0,0);
+    _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
+}
+
+void Controlleur::demarrer(){
+    etat_ = EtatRobot::INIT;
+    bouton_ = TypeBouton::AUCUN;
+
+    while(true){
+
+        switch (etat_)
+        {
+        case EtatRobot::INIT:
+            DEBUG_PRINT("INIT");
+            _delay_ms(50);
+            break;
+
+        case EtatRobot::DETECTION:
+            DEBUG_PRINT("DETECTION");
+            detecter();
+            break;
+
+        case EtatRobot::TRANSMISSION:
+            DEBUG_PRINT("TRANSMISSION");
+            transmettre();
+            break;
+        
+        }
+
+    }
+
 
 }
