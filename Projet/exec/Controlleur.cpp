@@ -3,6 +3,43 @@
  */
 #include "Controlleur.h"
 
+bool rebond(bool valActive, int PIN){
+    if(valActive){
+        if ((PIND & PIN)) 
+        {
+            _delay_ms(TEMPS_REBONDS);
+            if ((PIND & PIN))
+            {
+                return true;
+            }
+        }
+    }
+    else{
+        if (!(PIND & PIN)) 
+        {
+            _delay_ms(TEMPS_REBONDS);
+            if (!(PIND & PIN))
+            {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+ISR (INT0_vect) {
+    if(rebond(true, 0x04)){
+        bouton = TypeBouton::INTERUPT;
+    }
+}
+
+ISR (INT1_vect) {
+    if(rebond(false, 0x08)){
+        bouton = TypeBouton::EXTERNE;
+    }
+}
+
 Controlleur::Controlleur(Robot* r){
     robot_ = r;
 }
@@ -81,6 +118,9 @@ void Controlleur::tournerDroite(){
     robot_->moteur.changerDirection(Direction::AVANT);
     robot_->moteur.ajustementPWM(0,0);
     _delay_ms(PERIODE_TOURNER);
+    
+    orientationN_++;
+    updateOrientation();
 }
 
 void Controlleur::tournerGauche(){
@@ -90,19 +130,85 @@ void Controlleur::tournerGauche(){
     robot_->moteur.changerDirection(Direction::AVANT);
     robot_->moteur.ajustementPWM(0,0);
     _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
+
+    orientationN_--;
+    updateOrientation();
+}
+
+void Controlleur::updateOrientation(){
+    if(orientationN_ == (HUITIEME*4 + 1)){
+        orientationN_ = (-HUITIEME*4) + 1;
+    }
+    if(orientationN_ == (-HUITIEME*4)){
+        orientationN_ = (HUITIEME*4);
+    }
+    float normalise = (orientationN_ + (HUITIEME * 4.0f)) / (8.0f * HUITIEME);
+
+    if (normalise > 0.4375f && normalise <= 0.5625f) {
+        orientation_ = Boussole::NORD;
+        DEBUG_PRINT("NORD");
+    }
+    else if (normalise >= 0.5625f && normalise <= 0.6875f) {
+        orientation_ = Boussole::NORDEST;
+        DEBUG_PRINT("NORDEST");
+    }
+    else if (normalise >= 0.6875f && normalise <= 0.8125f) {
+        orientation_ = Boussole::EST;
+        DEBUG_PRINT("EST");
+    }
+    else if (normalise >= 0.8125f && normalise <= 0.9375f) {
+        orientation_ = Boussole::SUDEST;
+        DEBUG_PRINT("SUDEST");
+    }
+    else if (normalise >= 0.9375f || normalise <= 0.0625f) {
+        orientation_ = Boussole::SUD;
+        DEBUG_PRINT("SUD");
+    }
+    else if (normalise >= 0.0625f && normalise <= 0.1875f) {
+        orientation_ = Boussole::SUDOUEST;
+        DEBUG_PRINT("SUDOUEST");
+    }
+    else if (normalise >= 0.1875f && normalise <= 0.3125f) {
+        orientation_ = Boussole::OUEST;
+        DEBUG_PRINT("OUEST");
+    }
+    else if (normalise >= 0.3125f && normalise <= 0.4375f) {
+        orientation_ = Boussole::NORDOUEST;
+        DEBUG_PRINT("NORDOUEST");
+    }
+    else{
+        DEBUG_PRINT("mauvais angle");
+    }
+    
 }
 
 void Controlleur::demarrer(){
     etat_ = EtatRobot::INIT;
-    bouton_ = TypeBouton::AUCUN;
-
     while(true){
 
         switch (etat_)
         {
         case EtatRobot::INIT:
-            DEBUG_PRINT("INIT");
-            _delay_ms(50);
+            
+            switch (bouton)
+            {
+            case TypeBouton::AUCUN:
+                DEBUG_PRINT("AUCUN");
+                break;
+            
+            case TypeBouton::INTERUPT:
+                DEBUG_PRINT("INTERUPT");
+                bouton = TypeBouton::AUCUN;
+                //etat_ = EtatRobot::DETECTION;
+                break;
+            
+            case TypeBouton::EXTERNE:
+                DEBUG_PRINT("EXTERNE");
+                bouton = TypeBouton::AUCUN;
+                break;
+            }
+            //_delay_ms(200);
+
             break;
 
         case EtatRobot::DETECTION:
@@ -121,3 +227,4 @@ void Controlleur::demarrer(){
 
 
 }
+

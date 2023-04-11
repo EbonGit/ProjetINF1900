@@ -5,7 +5,7 @@
 
 enum EtatTransmission
 {
-    DEBUT = 0,
-    ENVOI = 1,
-    FIN = 2
+    DEBUT,
+    ENVOI,
+    FIN
 };

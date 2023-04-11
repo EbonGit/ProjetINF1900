@@ -51,5 +51,7 @@ public:
     Moteur moteur;
     GestionSon son;
     IR ir = IR();
+    Bouton interupt = Bouton();
+    Bouton externe = Bouton(0x08);
 };
 

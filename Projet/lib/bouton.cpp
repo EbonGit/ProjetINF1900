@@ -10,8 +10,8 @@ Bouton::Bouton(int masque){
 
 void Bouton::init(){
     cli ();
-    EIMSK |= (1 << INT0);
-    EICRA |= (1 << INT0);
+    EIMSK |= (1 << INT0) | (1 << INT1);
+    EICRA |= (1 << ISC11) | (1 << ISC01) | (1 << ISC00);
     sei ();
 
     peutChangerEtat_ = true;

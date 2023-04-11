@@ -11,59 +11,66 @@
 #define DDR_IN 0x00
 #define DDR_OUT 0xff
 
-#define HUITIEME 40
+#define HUITIEME 8.0
 
-#define PERIODE_TOURNER 10
+#define interuptPIN 0x04
+#define externePIN 0x08
+#define TEMPS_REBONDS 20
+
+#define PERIODE_TOURNER 40
 #define DELTA_TOURNER 1
 
 #define RANGE_PETIT 20 //provisoire
 #define RANGE_GRAND 30
 
-enum EtatRobot
+enum class EtatRobot
 {
-    INIT = 0,
-    DETECTION = 1,
-    TRANSMISSION = 2
+    INIT,
+    DETECTION,
+    TRANSMISSION
     
 };
 
-enum TypeBouton
+enum class TypeBouton
 {
-    AUCUN = -1,
-    INTERUPT = 0,
-    EXTERNE = 1
+    AUCUN,
+    INTERUPT,
+    EXTERNE
 };
 
-enum Boussole
+extern volatile TypeBouton bouton;
+
+enum class Boussole
 {
-    NORD = 0,
-    NORDEST = 1,
-    EST = 2,
-    SUDEST = 3,
-    SUD = 4,
-    SUDOUEST = 5,
-    OUEST = 6,
-    NORDOUEST = 7,
+    NORD,
+    NORDEST,
+    EST,
+    SUDEST,
+    SUD,
+    SUDOUEST,
+    OUEST,
+    NORDOUEST
 };
 
 class Controlleur
 {
 private:
-   Robot* robot_;
+   float orientationN_;
    Boussole orientation_;
    EtatRobot etat_;
-   TypeBouton bouton_ = TypeBouton::AUCUN;
    
    EtatDetection etatDetection_ = EtatDetection::ATTENDRE_1;
    EtatTransmission etatTransmission_ = EtatTransmission::DEBUT;
 public:
+    Robot* robot_;
     //Controlleur() = default;
     Controlleur(Robot*);
     void demarrer();
+    void updateOrientation();
 
     void detecter();
     void transmettre();
-
+    
     //action
     void suivre(int tour_restant, int distance_active, int distance_stop);
     void virerDroite();

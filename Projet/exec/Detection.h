@@ -3,17 +3,17 @@
  */
 #include <librairie.h>
 
-enum EtatDetection
+enum class EtatDetection
 {
-    ATTENDRE_1 = 0,
-    HAUT = 1,
-    DROIT = 2,
-    RECHERCHE = 3,
-    TROUVE = 4,
-    NON_TROUVE = 5,
-    AVANCER = 6,
-    PROCHE = 7,
-    ATTENDRE_2 = 8
+    ATTENDRE_1,
+    HAUT,
+    DROIT,
+    RECHERCHE,
+    TROUVE,
+    NON_TROUVE,
+    AVANCER,
+    PROCHE,
+    ATTENDRE_2
 };
 
 
