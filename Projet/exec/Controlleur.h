@@ -18,7 +18,7 @@
 #define TEMPS_REBONDS 20
 
 #define PERIODE_TOURNER 40
-#define DELTA_TOURNER 1
+#define DELTA_TOURNER 0
 
 #define RANGE_PETIT 20 //provisoire
 #define RANGE_GRAND 30
@@ -57,6 +57,8 @@ class Controlleur
 private:
    float orientationN_;
    Boussole orientation_;
+   int distance_ = -1;
+   Boussole poteauBoussole;
    EtatRobot etat_;
    
    EtatDetection etatDetection_ = EtatDetection::ATTENDRE_1;
@@ -70,9 +72,13 @@ public:
 
     void detecter();
     void transmettre();
+
+    //provisoire
+    void afficherPoteau();
     
     //action
     void suivre(int tour_restant, int distance_active, int distance_stop);
+    void rechercher();
     void virerDroite();
     void virerGauche();
     void tournerDroite();

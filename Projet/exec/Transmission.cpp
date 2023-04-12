@@ -7,7 +7,7 @@ void Controlleur::transmettre(){
     switch (etatTransmission_)
     {
     case EtatTransmission::DEBUT:
-        
+        DEBUG_PRINT("DEBUT");
         break;
 
     case EtatTransmission::ENVOI:

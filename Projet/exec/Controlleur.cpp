@@ -47,12 +47,12 @@ Controlleur::Controlleur(Robot* r){
 void Controlleur::virerDroite(){
     robot_->moteur.changerDirection(Direction::DROITE);
     robot_->moteur.ajustementPWM(255,255);
-    _delay_ms(10);
+    _delay_ms(20);
     robot_->moteur.changerDirection(Direction::AVANT);
     _delay_ms(50);
     robot_->moteur.changerDirection(Direction::DROITE);
     robot_->moteur.ajustementPWM(0,0);
-    _delay_ms(25);
+    _delay_ms(20);
 }
 
 void Controlleur::virerGauche(){
@@ -63,7 +63,7 @@ void Controlleur::virerGauche(){
     _delay_ms(50);
     robot_->moteur.changerDirection(Direction::GAUCHE);
     robot_->moteur.ajustementPWM(0,0);
-    _delay_ms(25);
+    _delay_ms(20);
 }
 
 void Controlleur::suivre(int tour_restant_, int distance_active, int distance_stop){
@@ -73,7 +73,7 @@ void Controlleur::suivre(int tour_restant_, int distance_active, int distance_st
     bool estDroite = true;
 
     while(true){
-        int distance = robot_->ir.distanceInch();
+        int distance = (int)robot_->ir.distanceInch();
         DEBUG_PRINT(distance);
 
         if(estDroite){
@@ -83,7 +83,7 @@ void Controlleur::suivre(int tour_restant_, int distance_active, int distance_st
             virerGauche();
         }
 
-        if(distance < distance_active){
+        if(distance < distance_active && distance != 0){
             trigger = true;
         }
 
@@ -103,8 +103,9 @@ void Controlleur::suivre(int tour_restant_, int distance_active, int distance_st
             }
         }
 
-        if(distance < distance_stop){
-            while(true);
+        if(distance < distance_stop && distance != 0){
+            DEBUG_PRINT("PROCHE");
+            break;
         }
 
     }
@@ -199,12 +200,13 @@ void Controlleur::demarrer(){
             case TypeBouton::INTERUPT:
                 DEBUG_PRINT("INTERUPT");
                 bouton = TypeBouton::AUCUN;
-                //etat_ = EtatRobot::DETECTION;
+                etat_ = EtatRobot::DETECTION;
                 break;
             
             case TypeBouton::EXTERNE:
                 DEBUG_PRINT("EXTERNE");
                 bouton = TypeBouton::AUCUN;
+                etat_ = EtatRobot::TRANSMISSION;
                 break;
             }
             //_delay_ms(200);
@@ -212,12 +214,12 @@ void Controlleur::demarrer(){
             break;
 
         case EtatRobot::DETECTION:
-            DEBUG_PRINT("DETECTION");
+            //DEBUG_PRINT("DETECTION");
             detecter();
             break;
 
         case EtatRobot::TRANSMISSION:
-            DEBUG_PRINT("TRANSMISSION");
+            //DEBUG_PRINT("TRANSMISSION");
             transmettre();
             break;
         
@@ -227,4 +229,3 @@ void Controlleur::demarrer(){
 
 
 }
-
