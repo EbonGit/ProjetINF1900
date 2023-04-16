@@ -11,17 +11,19 @@
 #define DDR_IN 0x00
 #define DDR_OUT 0xff
 
-#define HUITIEME 8.0
+#define HUITIEME 30.0
 
 #define interuptPIN 0x04
 #define externePIN 0x08
 #define TEMPS_REBONDS 20
 
-#define PERIODE_TOURNER 40
+const uint8_t fin = 8;
+
+#define PERIODE_TOURNER 25
 #define DELTA_TOURNER 0
 
-#define RANGE_PETIT 20 //provisoire
-#define RANGE_GRAND 30
+#define RANGE_PETIT 60 //provisoire
+#define RANGE_GRAND 120
 
 enum class EtatRobot
 {
@@ -40,16 +42,16 @@ enum class TypeBouton
 
 extern volatile TypeBouton bouton;
 
-enum class Boussole
+enum Boussole
 {
-    NORD,
-    NORDEST,
-    EST,
-    SUDEST,
-    SUD,
-    SUDOUEST,
-    OUEST,
-    NORDOUEST
+    NORD = 0,
+    NORDEST = 1,
+    EST = 2,
+    SUDEST = 3,
+    SUD = 4,
+    SUDOUEST = 5,
+    OUEST = 6,
+    NORDOUEST = 7
 };
 
 class Controlleur
@@ -59,7 +61,10 @@ private:
    Boussole orientation_;
    int distance_ = -1;
    Boussole poteauBoussole;
+   int nombrePoteau = 0;
    EtatRobot etat_;
+
+    int certitude = 0;
    
    EtatDetection etatDetection_ = EtatDetection::ATTENDRE_1;
    EtatTransmission etatTransmission_ = EtatTransmission::DEBUT;
@@ -75,9 +80,12 @@ public:
 
     //provisoire
     void afficherPoteau();
+    void enregistrerPoteau();
+    void lireMemoire();
     
     //action
     void suivre(int tour_restant, int distance_active, int distance_stop);
+    void estCertain();
     void rechercher();
     void virerDroite();
     void virerGauche();

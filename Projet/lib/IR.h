@@ -9,16 +9,16 @@
 #include "can.h"
 #include "debug.h"
 
-#define VREF 4.3 //IMPORTANT A CHANGER SI SUR PILE 9V
+#define VREF 5.0 //IMPORTANT A CHANGER SI SUR PILE 9V
 
 class IR
 {
 private:
-    double getVolt();
     void init();
     
 public:
     IR();
+    double getVolt();
     double distanceInch();
     double distanceCm();
     can c = can();

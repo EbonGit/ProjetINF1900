@@ -47,44 +47,48 @@ Controlleur::Controlleur(Robot* r){
 void Controlleur::virerDroite(){
     robot_->moteur.changerDirection(Direction::DROITE);
     robot_->moteur.ajustementPWM(255,255);
-    _delay_ms(20);
+    _delay_ms(10);
     robot_->moteur.changerDirection(Direction::AVANT);
-    _delay_ms(50);
+    _delay_ms(40);
     robot_->moteur.changerDirection(Direction::DROITE);
     robot_->moteur.ajustementPWM(0,0);
-    _delay_ms(20);
+    _delay_ms(10);
 }
 
 void Controlleur::virerGauche(){
     robot_->moteur.changerDirection(Direction::GAUCHE);
     robot_->moteur.ajustementPWM(255,255);
-    _delay_ms(20);
+    _delay_ms(10);
     robot_->moteur.changerDirection(Direction::AVANT);
-    _delay_ms(50);
+    _delay_ms(40);
     robot_->moteur.changerDirection(Direction::GAUCHE);
     robot_->moteur.ajustementPWM(0,0);
-    _delay_ms(20);
+    _delay_ms(10);
 }
 
 void Controlleur::suivre(int tour_restant_, int distance_active, int distance_stop){
 
     int tour_restant = tour_restant_;
+    //int perdu_ = 0;
     bool trigger = false;
     bool estDroite = true;
 
     while(true){
-        int distance = (int)robot_->ir.distanceInch();
-        DEBUG_PRINT(distance);
+        int distance = (int)robot_->ir.distanceCm();
+        //DEBUG_PRINT(distance);
 
         if(estDroite){
             virerDroite();
+
         }
         else{
             virerGauche();
+
         }
 
         if(distance < distance_active && distance != 0){
             trigger = true;
+            DEBUG_PRINT(distance);
         }
 
         if(trigger){
@@ -95,12 +99,7 @@ void Controlleur::suivre(int tour_restant_, int distance_active, int distance_st
         if(tour_restant < 0){
             trigger = false;
             tour_restant = tour_restant_;
-            if(robot_->moteur.getDirection() == Direction::DROITE){
-                estDroite = false;
-            }
-            else{
-                estDroite = true;
-            }
+            estDroite = !estDroite;
         }
 
         if(distance < distance_stop && distance != 0){
@@ -120,8 +119,8 @@ void Controlleur::tournerDroite(){
     robot_->moteur.ajustementPWM(0,0);
     _delay_ms(PERIODE_TOURNER);
     
-    orientationN_++;
-    updateOrientation();
+    //orientationN_++;
+    //updateOrientation();
 }
 
 void Controlleur::tournerGauche(){
@@ -132,8 +131,8 @@ void Controlleur::tournerGauche(){
     robot_->moteur.ajustementPWM(0,0);
     _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
 
-    orientationN_--;
-    updateOrientation();
+    //orientationN_--;
+    //updateOrientation();
 }
 
 void Controlleur::updateOrientation(){
@@ -201,6 +200,11 @@ void Controlleur::demarrer(){
                 DEBUG_PRINT("INTERUPT");
                 bouton = TypeBouton::AUCUN;
                 etat_ = EtatRobot::DETECTION;
+                for (uint8_t i = 0; i < 20; i++)
+                {
+                    robot_->memoire.ecriture(i, fin);
+                    _delay_ms(25);
+                }
                 break;
             
             case TypeBouton::EXTERNE:

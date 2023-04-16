@@ -32,12 +32,6 @@ int main(){
     
     controlleur.demarrer();
 
-    while (true)
-    {
-        int d = (int)robot.ir.distanceInch();
-        DEBUG_PRINT(d);
-    }
-
     //controlleur.suivre(3, 35, 4);
 
     /* for (int i = 0; i < 4; i++)
