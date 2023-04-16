@@ -11,7 +11,7 @@
 #define DDR_IN 0x00
 #define DDR_OUT 0xff
 
-#define HUITIEME 30.0
+#define HUITIEME 12
 
 #define interuptPIN 0x04
 #define externePIN 0x08
@@ -22,8 +22,8 @@ const uint8_t fin = 8;
 #define PERIODE_TOURNER 25
 #define DELTA_TOURNER 0
 
-#define RANGE_PETIT 60 //provisoire
-#define RANGE_GRAND 120
+#define RANGE_PETIT 35 //provisoire
+#define RANGE_GRAND 140
 
 enum class EtatRobot
 {
@@ -85,8 +85,8 @@ public:
     
     //action
     void suivre(int tour_restant, int distance_active, int distance_stop);
-    void estCertain();
-    void rechercher();
+    void estCertain(int, int);
+    void rechercher(int, int);
     void virerDroite();
     void virerGauche();
     void tournerDroite();

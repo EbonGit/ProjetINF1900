@@ -9,9 +9,9 @@ void Controlleur::transmettre(){
     case EtatTransmission::DEBUT:
         while (true)
         {
-            int d = (int)robot_->ir.distanceCm();
-            DEBUG_PRINT(d);
-            //lireMemoire();
+            //int d = (int)robot_->ir.distanceCm();
+            //DEBUG_PRINT(d);
+            lireMemoire();
             _delay_ms(50);
         }
         break;

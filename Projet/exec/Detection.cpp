@@ -12,7 +12,7 @@ void Controlleur::detecter(){
         // robot_->timer.attendre(10);
         // robot_->led.changerCouleur(EtatLed::VERT);
         // robot_->timer.attendre(5);
-        robot_->led.changerCouleurAmbre(robot_->timer, 5, 3, 1);
+        robot_->led.changerCouleurAmbre(robot_->timer, 3, 5, 1);
         switch (bouton)
             {
             case TypeBouton::AUCUN:
@@ -57,7 +57,16 @@ void Controlleur::detecter(){
 
     case EtatDetection::RECHERCHE:
         certitude = 0;
-        rechercher();
+        rechercher(0, RANGE_PETIT);
+        if(distance_ == -1){
+            rechercher(1, RANGE_GRAND);
+            if(distance_ == -1){
+            robot_->moteur.ajustementPWM(0,0);
+            etatDetection_ = EtatDetection::NON_TROUVE;
+            break;
+            }
+        }
+        
         updateOrientation();
         //rectification = 8;
         poteauBoussole = orientation_;
@@ -75,7 +84,7 @@ void Controlleur::detecter(){
         break;
     //TODO si ne trouve pas
     case EtatDetection::NON_TROUVE:
-        
+        DEBUG_PRINT("il y a rien");
         break;
 
     case EtatDetection::AVANCER:
@@ -114,74 +123,45 @@ void Controlleur::detecter(){
     
 }
 
-void Controlleur::rechercher(){
+void Controlleur::rechercher(int valeur, int distanceLimite){
     int remisZero = 0;
-    if(orientation_ == Boussole::EST){
-        robot_->moteur.changerDirection(Direction::GAUCHE);
-        robot_->moteur.ajustementPWM(250,250);
-        _delay_ms(100);
-        robot_->moteur.ajustementPWM(100,100);
-        while(true){
-            remisZero++;
-            //tournerGauche();
-            float d = robot_->ir.distanceCm();
-            if(d < RANGE_GRAND && d != 0){
-                DEBUG_PRINT(d);
-                DEBUG_PRINT("HIT");
-                if(certitude == 0){
-                    distance_ = 1;
-                    if(d < RANGE_PETIT){
-                        distance_ = 0;
-                    }
-                }
-                
-                break;
-            }
-            orientationN_--;
-            if(remisZero > 20){
-                certitude = 0;
-            }
-        }
-        //updateOrientation();
+    
+    robot_->moteur.changerDirection(Direction::DROITE);
+    robot_->moteur.ajustementPWM(200,200);
+    _delay_ms(50);
+    robot_->moteur.ajustementPWM(80,80);
 
-    }
-    else{
-        robot_->moteur.changerDirection(Direction::DROITE);
-        robot_->moteur.ajustementPWM(250,250);
-        _delay_ms(100);
+    while(true){
+        robot_->moteur.ajustementPWM(0,0);
+        _delay_ms(10);
         robot_->moteur.ajustementPWM(100,100);
-        while(true){
-            remisZero++;
-            //tournerDroite();
-            float d = robot_->ir.distanceCm();
-            if(d < RANGE_GRAND && d != 0){
-                DEBUG_PRINT(d);
-                DEBUG_PRINT("HIT");
-                if(certitude == 0){
-                    distance_ = 1;
-                    if(d < RANGE_PETIT){
-                        distance_ = 0;
-                    }
-                }
-                break;
-            }
-            orientationN_++;
-            if(remisZero > 20){
-                certitude = 0;
-            }
+        remisZero++;
+        float d = robot_->ir.distanceCm();
+        if(d < distanceLimite && d != 0){
+            DEBUG_PRINT(d);
+            DEBUG_PRINT("HIT");
+            //distance_ = valeur;
+            break;
         }
-         //updateOrientation();
+        orientationN_++;
+        //DEBUG_PRINT(orientationN_);
+        updateOrientation();
+        if(orientationN_ == 0){
+            return;
+        }
+        if(remisZero > 20){
+            certitude = 0;
+        }
     }
     robot_->moteur.changerDirection(Direction::AVANT);
     robot_->moteur.ajustementPWM(0,0);
     
-
     for (uint8_t i = 0; i < 8; i++)
     {
         tournerGauche();
     }
     certitude++;
-    estCertain();
+    estCertain(valeur, distanceLimite);
 
 
 }
@@ -220,13 +200,14 @@ void Controlleur::afficherPoteau(){
 void Controlleur::enregistrerPoteau(){
     robot_->memoire.ecriture(nombrePoteau, distance_);
     _delay_ms(25);
-    robot_->memoire.ecriture(nombrePoteau + 1, orientationN_);
+    robot_->memoire.ecriture(nombrePoteau + 1, orientation_);
     _delay_ms(25);
     nombrePoteau = nombrePoteau + 2;
 }
 
-void Controlleur::estCertain(){
+void Controlleur::estCertain(int valeur, int distanceLimite){
     bool trouve = true;
+    orientationN_--;
     for (uint8_t i = 0; i < 4; i++)
     {
         int distance = (int)robot_->ir.distanceCm();
@@ -237,10 +218,14 @@ void Controlleur::estCertain(){
     }
 
     if(certitude > 3){
+        distance_ = valeur;
     }
     else{
         if(!trouve){
-            rechercher();
+            rechercher(valeur, distanceLimite);
+        }
+        else{
+            distance_ = valeur;
         }
 
     }

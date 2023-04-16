@@ -13,7 +13,7 @@ void IR::init(){
 
 double IR::getVolt(){
     uint16_t val_1 = (c.lecture(PORTA & 0x00));
-    _delay_ms(25);
+    _delay_ms(50);
     uint16_t val_2 = (c.lecture(PORTA & 0x00));
     // if(val_1 == 0 || val_2 == 0){
     //     return 0;
@@ -31,7 +31,7 @@ double IR::getVolt(){
 }
 
 double IR::distanceCm(){
-    return 27.86 * pow(getVolt(), -1.15);
+    return 27.0 * pow(getVolt(), -1.2);
 }
 
 double IR::distanceInch(){
