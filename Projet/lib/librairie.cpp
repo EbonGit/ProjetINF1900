@@ -9,6 +9,7 @@ Robot::Robot(volatile int* v){
     timer.setVolatile(v);
     led.changerCouleur(EtatLed::OFF);
     sequenceDebut();
+    rs232.initialisationUART();
 }
 
 //séquence arbitraire joué lors de l'allumage du robot

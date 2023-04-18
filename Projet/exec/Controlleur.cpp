@@ -29,47 +29,51 @@ bool rebond(bool valActive, int PIN){
 }
 
 ISR (INT0_vect) {
-    if(rebond(true, 0x04)){
+    if(rebond(true, interuptPIN)){
         bouton = TypeBouton::INTERUPT;
     }
 }
 
 ISR (INT1_vect) {
-    if(rebond(false, 0x08)){
+    if(rebond(false, externePIN)){
         bouton = TypeBouton::EXTERNE;
     }
 }
 
 Controlleur::Controlleur(Robot* r){
+    
     robot_ = r;
 }
 
 void Controlleur::virerDroite(){
     robot_->moteur.changerDirection(Direction::DROITE);
-    robot_->moteur.ajustementPWM(255,255);
+    robot_->moteur.ajustementPWM(vitesseMax, vitesseMax);
     _delay_ms(10);
+
     robot_->moteur.changerDirection(Direction::AVANT);
     _delay_ms(40);
+    
     robot_->moteur.changerDirection(Direction::DROITE);
-    robot_->moteur.ajustementPWM(0,0);
+    robot_->moteur.ajustementPWM(ZERO,ZERO);
     _delay_ms(10);
 }
 
 void Controlleur::virerGauche(){
     robot_->moteur.changerDirection(Direction::GAUCHE);
-    robot_->moteur.ajustementPWM(255,255);
+    robot_->moteur.ajustementPWM(vitesseMax, vitesseMax);
     _delay_ms(10);
+
     robot_->moteur.changerDirection(Direction::AVANT);
     _delay_ms(40);
+
     robot_->moteur.changerDirection(Direction::GAUCHE);
-    robot_->moteur.ajustementPWM(0,0);
+    robot_->moteur.ajustementPWM(ZERO, ZERO);
     _delay_ms(10);
 }
 
 void Controlleur::suivre(int tour_restant_, int distance_active, int distance_stop){
 
     int tour_restant = tour_restant_;
-    //int perdu_ = 0;
     bool trigger = false;
     bool estDroite = true;
 
@@ -113,36 +117,32 @@ void Controlleur::suivre(int tour_restant_, int distance_active, int distance_st
 
 void Controlleur::tournerDroite(){
     robot_->moteur.changerDirection(Direction::DROITE);
-    robot_->moteur.ajustementPWM(255,255);
+    robot_->moteur.ajustementPWM(vitesseMax, vitesseMax);
     _delay_ms(PERIODE_TOURNER);
+
     robot_->moteur.changerDirection(Direction::AVANT);
-    robot_->moteur.ajustementPWM(0,0);
+    robot_->moteur.ajustementPWM(ZERO, ZERO);
     _delay_ms(PERIODE_TOURNER);
-    
-    //orientationN_++;
-    //updateOrientation();
 }
 
 void Controlleur::tournerGauche(){
     robot_->moteur.changerDirection(Direction::GAUCHE);
-    robot_->moteur.ajustementPWM(255,255);
-    _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
-    robot_->moteur.changerDirection(Direction::AVANT);
-    robot_->moteur.ajustementPWM(0,0);
+    robot_->moteur.ajustementPWM(vitesseMax, vitesseMax);
     _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
 
-    //orientationN_--;
-    //updateOrientation();
+    robot_->moteur.changerDirection(Direction::AVANT);
+    robot_->moteur.ajustementPWM(ZERO, ZERO);
+    _delay_ms(PERIODE_TOURNER + DELTA_TOURNER);
 }
 
 void Controlleur::updateOrientation(){
-    if(orientationN_ == (HUITIEME*4 + 1)){
-        orientationN_ = (-HUITIEME*4) + 1;
+    if(orientationN_ == (ENTIER/2 + 1)){
+        orientationN_ = (-ENTIER/2) + 1;
     }
-    if(orientationN_ == (-HUITIEME*4)){
-        orientationN_ = (HUITIEME*4);
+    if(orientationN_ == (-ENTIER/2)){
+        orientationN_ = (ENTIER/2);
     }
-    float normalise = (orientationN_ + (HUITIEME * 4.0f)) / (8.0f * HUITIEME);
+    float normalise = (orientationN_ + (ENTIER/2)) / (ENTIER);
 
     if (normalise > 0.4375f && normalise <= 0.5625f) {
         orientation_ = Boussole::NORD;
@@ -200,10 +200,11 @@ void Controlleur::demarrer(){
                 DEBUG_PRINT("INTERUPT");
                 bouton = TypeBouton::AUCUN;
                 etat_ = EtatRobot::DETECTION;
-                for (uint8_t i = 0; i < 20; i++)
+                //effacer la mémoire externe
+                for (uint8_t i = 0; i < TAILLE_MEMOIRE; i++)
                 {
                     robot_->memoire.ecriture(i, fin);
-                    _delay_ms(25);
+                    _delay_ms(TEMPS_MEMOIRE);
                 }
                 break;
             
@@ -213,7 +214,6 @@ void Controlleur::demarrer(){
                 etat_ = EtatRobot::TRANSMISSION;
                 break;
             }
-            //_delay_ms(200);
 
             break;
 

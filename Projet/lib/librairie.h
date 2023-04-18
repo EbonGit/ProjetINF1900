@@ -51,6 +51,7 @@ public:
     Moteur moteur;
     GestionSon son;
     IR ir = IR();
+    RS232 rs232;
     Bouton interupt = Bouton();
     Bouton externe = Bouton(0x08);
 };
