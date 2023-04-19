@@ -24,6 +24,10 @@ void Controlleur::transmettre(){
         
         lireMemoire();
         robot_->rs232.transmissionUART(DEBUT_SVG); //début transmission SVG
+
+        robot_->led.changerCouleur(EtatLed::VERT);
+        _delay_ms(DEUX_SECONDE);
+
         etatTransmission_ = EtatTransmission::ENVOI;
         break;
 

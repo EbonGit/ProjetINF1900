@@ -1,7 +1,5 @@
 /* Auteurs: Kephren Delannay-Sampany, Jad Ben Rabhi, Amine Ghabia, Amine Zerouali
-
  * Description: 
-
  */
 
 #include "Controlleur.h"
@@ -14,7 +12,7 @@ void Controlleur::detecter(){
 
     case EtatDetection::ATTENDRE_1:
 
-        robot_->led.changerCouleurAmbre(robot_->timer, 7, 3, 1); //allume led orange (7 vert et 3 rouge 1 fois)
+        robot_->led.changerCouleurAmbre(robot_->timer, ratioVert, ratioRouge, 1); //allume led orange (7 vert et 3 rouge 1 fois)
 
         switch (bouton)
 
@@ -98,7 +96,7 @@ void Controlleur::detecter(){
         distance_ = inconnu;
 
         nombreTour = 0;
-        robot_->led.changerCouleur(EtatLed::ROUGE);
+        
         rechercher(0, RANGE_PETIT);
 
         if(distance_ == inconnu){
@@ -106,7 +104,7 @@ void Controlleur::detecter(){
             _delay_ms(UNE_SECONDE);
 
             nombreTour = 0;
-            robot_->led.changerCouleur(EtatLed::VERT);
+            
             rechercher(1, RANGE_GRAND);
 
             if(distance_ == inconnu){
@@ -153,7 +151,17 @@ void Controlleur::detecter(){
 
     case EtatDetection::NON_TROUVE:
 
-        DEBUG_PRINT("il y a rien");
+        robot_->son.ajusterSon(60);
+        _delay_ms(DEUX_SECONDE);
+        robot_->son.stopSon();
+        //led rouge 2Hz
+        while(true){
+            //DEBUG_PRINT("il y a rien");
+            robot_->led.changerCouleur(EtatLed::ROUGE);
+            _delay_ms(UNE_SECONDE/4);
+            robot_->led.changerCouleur(EtatLed::OFF);
+            _delay_ms(UNE_SECONDE/4);
+        }
 
         break;
 
@@ -169,6 +177,15 @@ void Controlleur::detecter(){
 
         DEBUG_PRINT("PROCHE");
 
+        for (uint8_t i = 0; i < 3; i++) //3 bips aigus
+        {
+            robot_->son.ajusterSon(56);
+            _delay_ms(DELAI_SON);
+            robot_->son.stopSon();
+            _delay_ms(DELAI_SON);
+        }
+        
+
         etatDetection_ = EtatDetection::ATTENDRE_2;
 
         break;
@@ -180,6 +197,10 @@ void Controlleur::detecter(){
             {
 
             case TypeBouton::AUCUN:  
+                
+                robot_->led.changerCouleurAmbre(robot_->timer, ratioVert, ratioRouge, SECONDE/(4*(ratioRouge + ratioVert)));
+                robot_->led.changerCouleur(EtatLed::OFF);
+                _delay_ms(DELAI_LED);
 
                 break;
 
@@ -193,7 +214,11 @@ void Controlleur::detecter(){
 
                 distance_ = inconnu;
 
-                etatDetection_ = EtatDetection::HAUT;
+                orientationN_ = ZERO * ENTIER;
+
+                updateOrientation();
+
+                etatDetection_ = EtatDetection::RECHERCHE;
 
                 break;
 

@@ -17,9 +17,19 @@ const uint8_t inconnu = -1;
 
 #define DELAI_STOP 100
 
+#define DELAI_SON 300
+
+#define DELAI_LED 250
+
 const uint8_t decalageCertain = 4;
 
 const uint8_t centrageCertain = 7;
+
+const uint8_t ratioVert = 7;
+
+const uint8_t ratioRouge = 3;
+
+#define SECONDE 7812
 
 
 enum class EtatDetection

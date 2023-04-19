@@ -34,6 +34,14 @@ void SVG_Creator::sendViaUSART(const char* text, int size) {
 	//cout << "fin de transmission" <<endl;
 	//cout << text << endl;
 	for(int i = 0; i < size; i++){
+		
+		if((i%10) == 0){
+			PORTA = (1 << PA3);
+			_delay_ms(50);
+			PORTA = (0 << PA2) | (0 << PA3);
+			_delay_ms(50);
+		}
+		
 		crc ^= (*text);
         for (int j = 0; j < 8; j++) {
             if (crc & 1)
