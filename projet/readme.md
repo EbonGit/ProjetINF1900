@@ -9,4 +9,4 @@
 5. Pour make l'executable et téléverser le programme dans le robot utiliser `make install` qui va compiler le programme, prendre correctement la librairie dans projet/build et envoyer le code dans le robot.
 
 ## Diagramme :
-![diagramme](/images/diagramme.png)
+![diagramme](images/diagramme.png)
